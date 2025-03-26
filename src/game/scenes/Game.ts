@@ -3,7 +3,13 @@ import { Reel } from "../objects/Reel";
 
 export class Game extends Scene {
   reels: Reel[] = [];
-  spinButton!: Phaser.GameObjects.Text;
+
+  // slot props
+  ITEMS = ["Bell", "Cherries", "Clover", "Gem", "Lemon", "Pig", "Nose", "Star"];
+  ITEM_HEIGHT = 50;
+  VISIBLE_HEIGHT = this.ITEM_HEIGHT * 3;
+  TOTAL_HEIGHT = this.ITEMS.length * this.ITEM_HEIGHT;
+  SPEED = 1.5;
 
   constructor() {
     super("Game");
@@ -27,7 +33,7 @@ export class Game extends Scene {
     this.reels = [new Reel(this, centerX, centerY - 200)];
 
     // Criar botão de girar
-    this.spinButton = this.add
+    this.add
       .text(centerX, centerY + 100, "GIRAR", {
         fontSize: "32px",
         backgroundColor: "#00ff00",
@@ -36,18 +42,19 @@ export class Game extends Scene {
       .setOrigin(0.5)
       .setInteractive()
       .on("pointerdown", () => {
-        this.reels[0].spin();
+        this.reels[0].spin("cherry");
       });
+
     this.add
-      .text(centerX + 100, centerY + 100, "STOP", {
+      .text(centerX, centerY + 220, "Console", {
         fontSize: "32px",
-        backgroundColor: "#f03000",
+        backgroundColor: "#00ff00",
         padding: { x: 10, y: 5 },
       })
       .setOrigin(0.5)
       .setInteractive()
       .on("pointerdown", () => {
-        this.reels[0].stop();
+        this.reels[0].console();
       });
   }
 

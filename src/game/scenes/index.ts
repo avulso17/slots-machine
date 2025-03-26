@@ -1,7 +1,7 @@
 import { Boot, Preloader } from "../core";
 import { Game } from "./Game";
+import { Gpt } from "./Gpt";
 import { Grok } from "./Grok";
 import { MainMenu } from "./MainMenu";
-import { SlotMachine } from "./SlotMachine";
 
-export const scenes = [Boot, Preloader, MainMenu, Game, SlotMachine, Grok];
+export const scenes = [Boot, Preloader, MainMenu, Game, Gpt, Grok];
