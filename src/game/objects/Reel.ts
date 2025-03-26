@@ -1,4 +1,10 @@
+type ReelConfig = {
+  onComplete: () => void;
+  turns?: number;
+};
+
 export class Reel extends Phaser.GameObjects.Container {
+  public onComplete: () => void;
   public TURNS = 2;
   private SLOTS: Phaser.GameObjects.Rectangle[] = [];
   private isSpinning: boolean;
@@ -12,8 +18,8 @@ export class Reel extends Phaser.GameObjects.Container {
     "star",
     "nose",
   ];
-  private readonly SPEED_FACTOR = 0.5;
-  private readonly SPIN_DURATION = 1000;
+  private readonly SPEED_FACTOR = 0.15;
+  private readonly SPIN_DURATION = 250;
   private readonly ITEM_SIZE = 52;
   private readonly SYMBOL_SIZE = 44;
   private readonly VISIBLE_HEIGHT = this.ITEM_SIZE * 3;
@@ -23,7 +29,7 @@ export class Reel extends Phaser.GameObjects.Container {
     return index * this.ITEM_SIZE - this.ITEM_SIZE;
   });
 
-  constructor(scene: Phaser.Scene, x: number, y: number, turns?: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, config: ReelConfig) {
     super(scene, x, y);
     this.scene = scene;
     scene.add.existing(this);
@@ -34,9 +40,11 @@ export class Reel extends Phaser.GameObjects.Container {
       .slice(1)
       .filter((_, index) => index % 2 === 0) as Phaser.GameObjects.Rectangle[];
 
-    if (turns) {
-      this.TURNS = turns;
+    if (config.turns) {
+      this.TURNS = config.turns;
     }
+
+    this.onComplete = config.onComplete;
   }
 
   private create() {
@@ -124,18 +132,6 @@ export class Reel extends Phaser.GameObjects.Container {
     const duration =
       this.SPIN_DURATION + distanceFactor * this.SPEED_FACTOR * 100;
 
-    // this.scene.tweens.add({
-    //   targets: targets,
-    //   y: `+=${Y}`,
-    //   duration,
-    //   ease: "Back",
-    //   easeParams: [0.3],
-    //   repeat: 0,
-    //   onComplete: () => {
-    //     this.stop();
-    //   },
-    // });
-
     this.scene.tweens.chain({
       targets: targets,
       tweens: [
@@ -143,14 +139,12 @@ export class Reel extends Phaser.GameObjects.Container {
           y: `+=${Y}`,
           duration,
           ease: "Linear",
-          // easeParams: [0.3],
           repeat: 0,
         },
         {
           y: "+=10",
-          duration: 75,
+          duration: 65,
           ease: "Power1",
-          // easeParams: [1],
           repeat: 0,
           yoyo: true,
         },
@@ -190,6 +184,7 @@ export class Reel extends Phaser.GameObjects.Container {
 
   private stop() {
     this.isSpinning = false;
-    this.setState("completed");
+    this.setState("stopped");
+    this.onComplete?.();
   }
 }

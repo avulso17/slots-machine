@@ -1,9 +1,8 @@
 import { Scene } from "phaser";
-import { Reel } from "../objects/Reel";
+import { SlotsMachine } from "../objects/SlotsMachine";
 
 export class Game extends Scene {
-  reels: Reel[] = [];
-  result: string[] = ["cherry", "diamond", "cherry"];
+  private slotsMachine: SlotsMachine;
 
   constructor() {
     super("Game");
@@ -27,11 +26,7 @@ export class Game extends Scene {
     const centerX = window.innerWidth / 2 - reelWidth * 2;
     const centerY = window.innerHeight / 2;
 
-    this.reels = [
-      new Reel(this, centerX, centerY - 200, 10),
-      new Reel(this, centerX + reelWidth, centerY - 200, 15),
-      new Reel(this, centerX + reelWidth * 2, centerY - 200, 20),
-    ];
+    this.slotsMachine = new SlotsMachine(this, 0, 0);
 
     // Criar botão de girar
     this.add
@@ -43,20 +38,12 @@ export class Game extends Scene {
       .setOrigin(0.5)
       .setInteractive()
       .on("pointerdown", () => {
-        this.reels[0].spin(this.result[0]);
-        this.reels[1].spin(this.result[1]);
-        this.reels[2].spin(this.result[2]);
+        this.slotsMachine.spinReels();
+        console.log(this.slotsMachine);
       });
   }
 
   update() {
-    this.reels.forEach((reel) => {
-      reel.update();
-    });
-  }
-
-  checkWin() {
-    const win = this.reels.every((reel) => reel.state === "completed");
-    console.log(win);
+    this.slotsMachine.update();
   }
 }
