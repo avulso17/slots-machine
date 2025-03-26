@@ -1,5 +1,5 @@
 export class Reel extends Phaser.GameObjects.Container {
-  TURNS = 2;
+  public TURNS = 2;
   private SLOTS: Phaser.GameObjects.Rectangle[] = [];
   private isSpinning: boolean;
   private wrapRect: Phaser.Geom.Rectangle;
@@ -12,17 +12,18 @@ export class Reel extends Phaser.GameObjects.Container {
     "star",
     "nose",
   ];
+  private readonly SPEED_FACTOR = 0.5;
+  private readonly SPIN_DURATION = 1000;
   private readonly ITEM_SIZE = 52;
   private readonly SYMBOL_SIZE = 44;
   private readonly VISIBLE_HEIGHT = this.ITEM_SIZE * 3;
   private readonly VISIBLE_WIDTH = 96;
   private readonly TOTAL_HEIGHT = this.ITEMS.length * this.ITEM_SIZE;
-  private readonly SPEED = 1.5;
   private readonly SEQUENCE_Y = this.ITEMS.map((_, index) => {
     return index * this.ITEM_SIZE - this.ITEM_SIZE;
   });
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, turns?: number) {
     super(scene, x, y);
     this.scene = scene;
     scene.add.existing(this);
@@ -32,6 +33,10 @@ export class Reel extends Phaser.GameObjects.Container {
     this.SLOTS = this.getAll()
       .slice(1)
       .filter((_, index) => index % 2 === 0) as Phaser.GameObjects.Rectangle[];
+
+    if (turns) {
+      this.TURNS = turns;
+    }
   }
 
   private create() {
@@ -101,7 +106,6 @@ export class Reel extends Phaser.GameObjects.Container {
           1
         )
         .setOrigin(0, 0)
-        .setStrokeStyle(2, 0x000000, 1)
         .setName(this.ITEMS[i])
         .setState(this.ITEMS[i]);
 
@@ -115,12 +119,17 @@ export class Reel extends Phaser.GameObjects.Container {
     const TURN_VALUE = this.TOTAL_HEIGHT * this.TURNS;
     const Y = TURN_VALUE + this.ITEM_SIZE * steps;
 
+    const distanceFactor = Y / this.ITEM_SIZE;
+
+    const duration =
+      this.SPIN_DURATION + distanceFactor * this.SPEED_FACTOR * 100;
+
     this.scene.tweens.add({
       targets: targets,
       y: `+=${Y}`,
-      duration: this.SPEED * 1000,
-      ease: "Linear",
-      easeParams: [1.5],
+      duration,
+      ease: "Back",
+      easeParams: [0.3],
       repeat: 0,
       onComplete: () => {
         this.stop();
@@ -133,6 +142,7 @@ export class Reel extends Phaser.GameObjects.Container {
   public spin(symbol: string) {
     if (this.isSpinning) return;
     this.isSpinning = true;
+    this.setState("spinning");
 
     const y_result =
       this.SLOTS.find((child) => {
@@ -156,5 +166,6 @@ export class Reel extends Phaser.GameObjects.Container {
 
   private stop() {
     this.isSpinning = false;
+    this.setState("completed");
   }
 }
