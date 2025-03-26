@@ -1,17 +1,15 @@
 export class Reel extends Phaser.GameObjects.Container {
-  private readonly symbolSize = 44;
-
   private isSpinning: boolean;
   private wrapRect: Phaser.Geom.Rectangle;
 
-  TURNS = 1;
-
   ITEMS = ["bell", "cherry", "clover", "diamond", "lemon", "star", "nose"];
   ITEM_SIZE = 52;
+  SYMBOL_SIZE = 44;
   ITEM_Y = 0;
   VISIBLE_HEIGHT = this.ITEM_SIZE * 3;
   VISIBLE_WIDTH = 96;
   TOTAL_HEIGHT = this.ITEMS.length * this.ITEM_SIZE;
+  TURNS = 2;
   SPEED = 1.5;
   OFFSET_Y = 0;
   OFFSET_Y_TARGET = 0;
@@ -36,31 +34,17 @@ export class Reel extends Phaser.GameObjects.Container {
   create() {
     this.createReel();
     this.createSlots();
+
+    // Criar uma máscara gráfica para limitar a visibilidade
+    const mask = this.scene.make.graphics({});
+    mask.fillStyle(0xffffff);
+    mask.fillRect(this.x, this.y, this.VISIBLE_WIDTH, this.VISIBLE_HEIGHT);
+
+    // Aplicar a máscara a este container
+    this.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, mask));
   }
 
   update() {
-    // if (this.isSpinning) {
-    //   this.OFFSET_Y += this.SPEED;
-
-    //   this.getAll()
-    //     .slice(1)
-    //     .forEach((item, i) => {
-    //       let y =
-    //         ((this.VISIBLE_HEIGHT - this.ITEM_SIZE) / 2 -
-    //           i * this.ITEM_SIZE +
-    //           this.OFFSET_Y) %
-    //         this.TOTAL_HEIGHT;
-
-    //       if (y <= -this.TOTAL_HEIGHT / 2) {
-    //         y += this.TOTAL_HEIGHT;
-    //       } else if (y >= this.TOTAL_HEIGHT / 2) {
-    //         y -= this.TOTAL_HEIGHT;
-    //       }
-
-    //       item.y = y;
-    //     });
-    // }
-
     Phaser.Actions.WrapInRectangle(
       this.getAll().slice(1),
       this.wrapRect,
@@ -86,7 +70,7 @@ export class Reel extends Phaser.GameObjects.Container {
 
   createSymbol(x: number, y: number, symbolKey: string) {
     const symbol = this.scene.add.image(x, y, symbolKey).setOrigin(0, 0);
-    symbol.setDisplaySize(this.symbolSize, this.symbolSize);
+    symbol.setDisplaySize(this.SYMBOL_SIZE, this.SYMBOL_SIZE);
 
     return symbol;
   }
@@ -96,8 +80,8 @@ export class Reel extends Phaser.GameObjects.Container {
       const y = i * this.ITEM_SIZE + this.ITEM_SIZE;
 
       const symbol = this.createSymbol(
-        this.VISIBLE_WIDTH / 2 - this.symbolSize / 2,
-        y + this.symbolSize / 10,
+        this.VISIBLE_WIDTH / 2 - this.SYMBOL_SIZE / 2,
+        y + this.SYMBOL_SIZE / 10,
         this.ITEMS[i]
       )
         .setOrigin(0, 0)
@@ -122,7 +106,7 @@ export class Reel extends Phaser.GameObjects.Container {
     }
   }
 
-  createTween(steps: number) {
+  initSpinAnimation(steps: number) {
     const targets = this.getAll().slice(1);
 
     const TURN_VALUE = this.TOTAL_HEIGHT * this.TURNS;
@@ -131,8 +115,9 @@ export class Reel extends Phaser.GameObjects.Container {
     this.scene.tweens.add({
       targets: targets,
       y: `+=${Y}`,
-      duration: 2000,
-      ease: "Back.easeOut",
+      duration: this.SPEED * 1000,
+      ease: "Linear",
+      easeParams: [1.5],
       repeat: 0,
       onComplete: () => {
         this.stop();
@@ -157,7 +142,7 @@ export class Reel extends Phaser.GameObjects.Container {
     const steps =
       (target_index - current_index + this.ITEMS.length) % this.ITEMS.length;
 
-    this.createTween(steps);
+    this.initSpinAnimation(steps);
   }
 
   console() {

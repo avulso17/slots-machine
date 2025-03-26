@@ -4,13 +4,6 @@ import { Reel } from "../objects/Reel";
 export class Game extends Scene {
   reels: Reel[] = [];
 
-  // slot props
-  ITEMS = ["Bell", "Cherries", "Clover", "Gem", "Lemon", "Pig", "Nose", "Star"];
-  ITEM_HEIGHT = 50;
-  VISIBLE_HEIGHT = this.ITEM_HEIGHT * 3;
-  TOTAL_HEIGHT = this.ITEMS.length * this.ITEM_HEIGHT;
-  SPEED = 1.5;
-
   constructor() {
     super("Game");
   }
@@ -24,6 +17,8 @@ export class Game extends Scene {
     this.load.image("clover", "clover.png");
     this.load.image("diamond", "gem.png");
     this.load.image("lemon", "lemon.png");
+    this.load.image("pig", "pig.png");
+    this.load.image("nose", "pig_nose.png");
   }
 
   create() {
