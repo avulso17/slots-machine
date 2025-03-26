@@ -52,7 +52,7 @@ export class Reel extends Phaser.GameObjects.Container {
     this.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, mask));
   }
 
-  update() {
+  public update() {
     Phaser.Actions.WrapInRectangle(
       this.getAll().slice(1),
       this.wrapRect,
@@ -124,13 +124,37 @@ export class Reel extends Phaser.GameObjects.Container {
     const duration =
       this.SPIN_DURATION + distanceFactor * this.SPEED_FACTOR * 100;
 
-    this.scene.tweens.add({
+    // this.scene.tweens.add({
+    //   targets: targets,
+    //   y: `+=${Y}`,
+    //   duration,
+    //   ease: "Back",
+    //   easeParams: [0.3],
+    //   repeat: 0,
+    //   onComplete: () => {
+    //     this.stop();
+    //   },
+    // });
+
+    this.scene.tweens.chain({
       targets: targets,
-      y: `+=${Y}`,
-      duration,
-      ease: "Back",
-      easeParams: [0.3],
-      repeat: 0,
+      tweens: [
+        {
+          y: `+=${Y}`,
+          duration,
+          ease: "Linear",
+          // easeParams: [0.3],
+          repeat: 0,
+        },
+        {
+          y: "+=10",
+          duration: 75,
+          ease: "Power1",
+          // easeParams: [1],
+          repeat: 0,
+          yoyo: true,
+        },
+      ],
       onComplete: () => {
         this.stop();
       },

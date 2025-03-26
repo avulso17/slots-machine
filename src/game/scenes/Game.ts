@@ -3,7 +3,7 @@ import { Reel } from "../objects/Reel";
 
 export class Game extends Scene {
   reels: Reel[] = [];
-  result: string[] = ["cherry", "bell", "bell"];
+  result: string[] = ["cherry", "diamond", "cherry"];
 
   constructor() {
     super("Game");
