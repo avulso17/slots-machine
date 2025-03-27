@@ -13,3 +13,8 @@ body {
   justify-content: center;
   align-items: center;
 }
+
+#game-container {
+  background: url("../assets/images/ui/background.png");
+  background-size: contain;
+}

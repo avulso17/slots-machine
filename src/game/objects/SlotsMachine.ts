@@ -58,10 +58,9 @@ export class SlotsMachine extends Phaser.GameObjects.Container {
   public spinReels() {
     this.reels.forEach((reel, index) => {
       const symbol = this.result[index] ?? "bell";
+      const animationType = index === 2 ? "bounce" : "base";
 
       this.scene.time.delayedCall(index * 200, () => {
-        const animationType = index === 2 ? "bounce" : "base";
-
         reel.spin({ symbol, animationType });
       });
     });

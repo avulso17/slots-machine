@@ -160,7 +160,7 @@ export class Reel extends Phaser.GameObjects.Container {
         {
           y: `+=${this.TOTAL_HEIGHT - this.ITEM_SIZE}`,
           duration: 1100,
-          ease: "Quint.out",
+          ease: "Quad.out",
           repeat: 0,
           setRoundPixels: true,
         },

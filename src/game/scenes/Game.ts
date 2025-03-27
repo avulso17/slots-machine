@@ -1,4 +1,5 @@
 import { Scene } from "phaser";
+import { Button } from "../objects/Button";
 import { SlotsMachine } from "../objects/SlotsMachine";
 
 export class Game extends Scene {
@@ -23,24 +24,33 @@ export class Game extends Scene {
 
   create() {
     const reelWidth = 96;
-    const centerX = window.innerWidth / 2 - reelWidth * 2;
-    const centerY = window.innerHeight / 2;
+    const centerX = 185;
+    const centerY = 362;
 
-    this.slotsMachine = new SlotsMachine(this, centerX, centerY - 100);
+    this.slotsMachine = new SlotsMachine(this, centerX - 90, centerY - 100);
 
-    // Criar botão de girar
-    this.add
-      .text(centerX + 120, centerY + 100, "GIRAR", {
-        fontSize: "32px",
-        backgroundColor: "#00ff00",
-        padding: { x: 10, y: 5 },
-      })
+    const button = new Button(this, {
+      x: centerX,
+      y: centerY + 250,
+      texture: "button-primary",
+      height: 56,
+      width: 200,
+    })
       .setOrigin(0.5)
       .setInteractive()
       .on("pointerdown", () => {
         this.slotsMachine.spinReels();
         // this.slotsMachine.console();
       });
+
+    this.tweens.add({
+      targets: button,
+      scale: 1.1,
+      duration: 1000,
+      ease: "sine.inout",
+      yoyo: true,
+      repeat: -1,
+    });
   }
 
   update() {

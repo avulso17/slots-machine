@@ -25,6 +25,10 @@ export class Preloader extends Scene {
   preload() {
     //  Load the assets for the game - Replace with your own assets
     this.load.setPath("assets/");
+
+    // Buttons
+    this.load.image("button-primary", "images/ui/primary-button.png");
+    this.load.font("aglet-ultra", "fonts/aglet-sans-ultra.otf");
   }
 
   create() {
