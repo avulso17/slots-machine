@@ -26,11 +26,11 @@ export class Game extends Scene {
     const centerX = window.innerWidth / 2 - reelWidth * 2;
     const centerY = window.innerHeight / 2;
 
-    this.slotsMachine = new SlotsMachine(this, 0, 0);
+    this.slotsMachine = new SlotsMachine(this, centerX, centerY - 100);
 
     // Criar botão de girar
     this.add
-      .text(centerX + 120, centerY + 50, "GIRAR", {
+      .text(centerX + 120, centerY + 100, "GIRAR", {
         fontSize: "32px",
         backgroundColor: "#00ff00",
         padding: { x: 10, y: 5 },
@@ -39,7 +39,7 @@ export class Game extends Scene {
       .setInteractive()
       .on("pointerdown", () => {
         this.slotsMachine.spinReels();
-        console.log(this.slotsMachine);
+        // this.slotsMachine.console();
       });
   }
 

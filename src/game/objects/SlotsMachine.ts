@@ -2,16 +2,31 @@ import { Reel } from "./Reel";
 
 export class SlotsMachine extends Phaser.GameObjects.Container {
   private reels: Reel[] = [];
-  private result: string[] = ["nose", "nose", "nose"];
+  private result: string[] = [];
   private resultText: Phaser.GameObjects.Text;
   private isSpinning: boolean = false;
+  private readonly SYMBOLS = [
+    "bell",
+    "cherry",
+    "clover",
+    "diamond",
+    "lemon",
+    "star",
+    "nose",
+  ];
 
   constructor(scene: Phaser.Scene, x: number, y: number) {
     super(scene, x, y);
     this.scene = scene;
     scene.add.existing(this);
 
-    this.create();
+    this.result = [
+      Phaser.Math.RND.pick(this.SYMBOLS),
+      Phaser.Math.RND.pick(this.SYMBOLS),
+      Phaser.Math.RND.pick(this.SYMBOLS),
+    ];
+
+    this.createReels();
   }
 
   public update() {
@@ -20,39 +35,51 @@ export class SlotsMachine extends Phaser.GameObjects.Container {
     });
   }
 
-  private create() {
-    this.createReels();
-  }
-
   private createReels() {
-    const reelWidth = 96;
+    const reelWidth = 56;
+    const reelSpacing = 4;
 
     for (let i = 0; i < 3; i++) {
-      const turns = i + 8;
-      const x = i * reelWidth;
-      const reel = new Reel(this.scene, x, 0, {
-        turns,
-        onComplete: () => {
-          if (i === 2) {
-            this.checkWin();
-          }
-        },
+      const reelX = i * (reelWidth + reelSpacing) + this.x;
+      const reel = new Reel(this.scene, reelX, this.y, {
+        onComplete: () => this.checkReelStopped(i),
       });
 
       this.reels.push(reel);
-      this.add(reel);
+    }
+  }
+
+  private checkReelStopped(reelIndex: number) {
+    if (reelIndex === 2) {
+      this.checkWin();
     }
   }
 
   public spinReels() {
-    this.reels.forEach((reel) => {
-      reel.spin(this.result[0]);
-      reel.spin(this.result[1]);
-      reel.spin(this.result[2]);
+    this.reels.forEach((reel, index) => {
+      const symbol = this.result[index] ?? "bell";
+
+      this.scene.time.delayedCall(index * 200, () => {
+        const animationType = index === 2 ? "bounce" : "base";
+
+        reel.spin({ symbol, animationType });
+      });
     });
   }
 
   public checkWin() {
     console.log(this.reels, this.result);
+
+    const win = this.result.every((symbol, i) => {
+      return symbol === this.result[i];
+    });
+
+    if (win) {
+      console.log("win");
+    }
+  }
+
+  public console() {
+    this.reels[0].console();
   }
 }

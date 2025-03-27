@@ -1,15 +1,22 @@
+type AnimationType = "base" | "bounce";
+
 type ReelConfig = {
   onComplete: () => void;
   turns?: number;
 };
 
+type SpinConfig = {
+  symbol: string;
+  animationType?: AnimationType;
+};
+
 export class Reel extends Phaser.GameObjects.Container {
   public onComplete: () => void;
   public TURNS = 2;
-  private SLOTS: Phaser.GameObjects.Rectangle[] = [];
   private isSpinning: boolean;
   private wrapRect: Phaser.Geom.Rectangle;
-  private readonly ITEMS = [
+  private SLOTS: Phaser.GameObjects.Rectangle[] = [];
+  private readonly ITEMS = Phaser.Utils.Array.Shuffle([
     "bell",
     "cherry",
     "clover",
@@ -17,13 +24,13 @@ export class Reel extends Phaser.GameObjects.Container {
     "lemon",
     "star",
     "nose",
-  ];
+  ]);
   private readonly SPEED_FACTOR = 0.15;
   private readonly SPIN_DURATION = 250;
   private readonly ITEM_SIZE = 52;
   private readonly SYMBOL_SIZE = 44;
   private readonly VISIBLE_HEIGHT = this.ITEM_SIZE * 3;
-  private readonly VISIBLE_WIDTH = 96;
+  private readonly VISIBLE_WIDTH = 56;
   private readonly TOTAL_HEIGHT = this.ITEMS.length * this.ITEM_SIZE;
   private readonly SEQUENCE_Y = this.ITEMS.map((_, index) => {
     return index * this.ITEM_SIZE - this.ITEM_SIZE;
@@ -32,32 +39,21 @@ export class Reel extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, x: number, y: number, config: ReelConfig) {
     super(scene, x, y);
     this.scene = scene;
-    scene.add.existing(this);
-
+    this.setName("reel");
     this.create();
-
+    this.onComplete = config.onComplete;
+    this.TURNS = config.turns ?? 2;
     this.SLOTS = this.getAll()
       .slice(1)
       .filter((_, index) => index % 2 === 0) as Phaser.GameObjects.Rectangle[];
 
-    if (config.turns) {
-      this.TURNS = config.turns;
-    }
-
-    this.onComplete = config.onComplete;
+    scene.add.existing(this);
   }
 
   private create() {
     this.createReel();
     this.createSlots();
-
-    // Criar uma máscara gráfica para limitar a visibilidade
-    const mask = this.scene.make.graphics({});
-    mask.fillStyle(0xffffff);
-    mask.fillRect(this.x, this.y, this.VISIBLE_WIDTH, this.VISIBLE_HEIGHT);
-
-    // Aplicar a máscara a este container
-    this.setMask(new Phaser.Display.Masks.GeometryMask(this.scene, mask));
+    this.createMask();
   }
 
   public update() {
@@ -66,15 +62,20 @@ export class Reel extends Phaser.GameObjects.Container {
       this.wrapRect,
       this.ITEM_SIZE
     );
+
+    this.on("update", () => {
+      console.log("update");
+    });
   }
 
   // Create
   private createReel() {
-    this.add(
-      this.scene.add
-        .rectangle(0, 0, this.VISIBLE_WIDTH, this.VISIBLE_HEIGHT, 0xffffff, 1)
-        .setOrigin(0, 0)
-    );
+    const reel = this.scene.add
+      .rectangle(0, 0, this.VISIBLE_WIDTH, this.VISIBLE_HEIGHT, 0xffffff, 1)
+      .setOrigin(0, 0)
+      .setName("reel-background");
+
+    this.add(reel);
 
     this.wrapRect = new Phaser.Geom.Rectangle(
       0,
@@ -121,7 +122,20 @@ export class Reel extends Phaser.GameObjects.Container {
     }
   }
 
-  private initSpinAnimation(steps: number) {
+  private createMask() {
+    // Criar uma máscara gráfica para limitar a visibilidade
+    const maskShape = this.scene.make.graphics();
+    maskShape.fillStyle(0xffffff);
+    maskShape.fillRect(this.x, this.y, this.VISIBLE_WIDTH, this.VISIBLE_HEIGHT);
+    maskShape.setName("mask");
+
+    const mask = maskShape.createGeometryMask();
+
+    // Aplicar a máscara a este container
+    this.setMask(mask);
+  }
+
+  private initSpinAnimation(steps: number, animationType?: "base" | "bounce") {
     const targets = this.getAll().slice(1);
 
     const TURN_VALUE = this.TOTAL_HEIGHT * this.TURNS;
@@ -132,14 +146,40 @@ export class Reel extends Phaser.GameObjects.Container {
     const duration =
       this.SPIN_DURATION + distanceFactor * this.SPEED_FACTOR * 100;
 
-    this.scene.tweens.chain({
-      targets: targets,
-      tweens: [
+    let tweens = [] as any[];
+
+    if (animationType === "bounce") {
+      tweens = [
         {
           y: `+=${Y}`,
           duration,
           ease: "Linear",
           repeat: 0,
+          setRoundPixels: true,
+        },
+        {
+          y: `+=${this.TOTAL_HEIGHT - this.ITEM_SIZE}`,
+          duration: 1100,
+          ease: "Quint.out",
+          repeat: 0,
+          setRoundPixels: true,
+        },
+        {
+          y: "+=52",
+          duration: 400,
+          ease: "Back.out",
+          repeat: 0,
+          setRoundPixels: true,
+        },
+      ];
+    } else {
+      tweens = [
+        {
+          y: `+=${Y}`,
+          duration,
+          ease: "Linear",
+          repeat: 0,
+          setRoundPixels: true,
         },
         {
           y: "+=10",
@@ -147,8 +187,14 @@ export class Reel extends Phaser.GameObjects.Container {
           ease: "Power1",
           repeat: 0,
           yoyo: true,
+          setRoundPixels: true,
         },
-      ],
+      ];
+    }
+
+    this.scene.tweens.chain({
+      targets: targets,
+      tweens,
       onComplete: () => {
         this.stop();
       },
@@ -157,28 +203,29 @@ export class Reel extends Phaser.GameObjects.Container {
 
   // Methods
   // funcao para spin symbols
-  public spin(symbol: string) {
+  public spin(config: SpinConfig) {
     if (this.isSpinning) return;
     this.isSpinning = true;
     this.setState("spinning");
 
     const y_result =
       this.SLOTS.find((child) => {
-        return child.name === symbol;
+        return child.name === config.symbol;
       })?.y ?? 52;
 
-    const current_index = this.SEQUENCE_Y.indexOf(y_result);
+    const current_index = this.SEQUENCE_Y.indexOf(Math.ceil(y_result));
+    console.log("current_index", current_index, "y", y_result);
     const target_index = 2;
 
     const steps =
       (target_index - current_index + this.ITEMS.length) % this.ITEMS.length;
 
-    this.initSpinAnimation(steps);
+    this.initSpinAnimation(steps, config.animationType);
   }
 
   public console() {
     this.getAll().forEach((child) => {
-      console.log(child);
+      console.log(child, this.SLOTS);
     });
   }
 
