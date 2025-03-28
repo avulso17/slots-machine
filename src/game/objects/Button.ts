@@ -53,6 +53,10 @@ export class Button extends Phaser.GameObjects.Container {
     this.text = new Text(this.scene, 0, 0, text, {
       fontSize: fontSize[config.size ?? "md"] * 1.5,
       resolution: 2,
+      stroke: config.variant === "primary" ? "#41001F" : "#170D19",
+      shadow: {
+        color: config.variant === "primary" ? "#41001F" : "#170D19",
+      },
     });
     this.text.setOrigin(0.5, 0.5);
     this.text.setDepth(1);
@@ -65,6 +69,8 @@ export class Button extends Phaser.GameObjects.Container {
 
     // Adiciona à cena
     this.scene.add.existing(this);
+
+    this.preFX?.addShine();
   }
 
   onPress() {

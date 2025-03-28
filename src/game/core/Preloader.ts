@@ -27,6 +27,9 @@ export class Preloader extends Scene {
     this.load.setPath("assets/");
 
     // Buttons
+    this.load.image("btn-base-lg", "images/ui/button/btn-base-lg.png");
+    this.load.image("btn-base-md", "images/ui/button/btn-base-md.png");
+    this.load.image("btn-base-sm", "images/ui/button/btn-base-sm.png");
     this.load.image("btn-primary-lg", "images/ui/button/btn-primary-lg.png");
     this.load.image("btn-primary-md", "images/ui/button/btn-primary-md.png");
     this.load.image("btn-primary-sm", "images/ui/button/btn-primary-sm.png");

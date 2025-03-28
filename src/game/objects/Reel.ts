@@ -209,7 +209,7 @@ export class Reel extends Phaser.GameObjects.Container {
       })?.y ?? 52;
 
     const current_index = this.SEQUENCE_Y.indexOf(Math.ceil(y_result));
-    console.log("current_index", current_index, "y", y_result);
+    // console.log("current_index", current_index, "y", y_result);
     const target_index = 2;
 
     const steps =
@@ -218,11 +218,11 @@ export class Reel extends Phaser.GameObjects.Container {
     this.initSpinAnimation(steps, config.animationType);
   }
 
-  public console() {
-    this.getAll().forEach((child) => {
-      console.log(child, this.SLOTS);
-    });
-  }
+  // public console() {
+  //   this.getAll().forEach((child) => {
+  //     console.log(child, this.SLOTS);
+  //   });
+  // }
 
   private stop() {
     this.isSpinning = false;

@@ -61,7 +61,10 @@ export class SlotsMachine extends Phaser.GameObjects.Container {
     this.isSpinning = true;
     this.reels.forEach((reel, index) => {
       const symbol = this.result[index] ?? "bell";
-      const animationType = index === 2 ? "bounce" : "base";
+      const animationType =
+        index === 2
+          ? (Phaser.Math.RND.pick(["bounce", "base"]) as "bounce" | "base")
+          : "base";
 
       this.scene.time.delayedCall(index * 200, () => {
         reel.spin({ symbol, animationType });
@@ -72,16 +75,12 @@ export class SlotsMachine extends Phaser.GameObjects.Container {
   public checkWin() {
     console.log(this.reels, this.result);
 
-    const win = this.result.every((symbol, i) => {
-      return symbol === this.result[i];
+    const win = this.result.every((symbol) => {
+      return symbol === this.result[0];
     });
 
     if (win) {
       console.log("win");
     }
-  }
-
-  public console() {
-    this.reels[0].console();
   }
 }
