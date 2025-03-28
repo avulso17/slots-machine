@@ -1,4 +1,4 @@
-import { Reel } from "./Reel";
+import { Reel, ReelAnimationType } from "./Reel";
 
 export class SlotsMachine extends Phaser.GameObjects.Container {
   private reels: Reel[] = [];
@@ -63,7 +63,7 @@ export class SlotsMachine extends Phaser.GameObjects.Container {
       const symbol = this.result[index] ?? "bell";
       const animationType =
         index === 2
-          ? (Phaser.Math.RND.pick(["bounce", "base"]) as "bounce" | "base")
+          ? (Phaser.Math.RND.pick(["bounce", "base"]) as ReelAnimationType)
           : "base";
 
       this.scene.time.delayedCall(index * 200, () => {

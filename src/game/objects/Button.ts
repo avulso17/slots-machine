@@ -1,9 +1,9 @@
 import { Text } from "./Text";
 
-type ButtonVariant = "primary" | "base";
-type ButtonSize = "sm" | "md" | "lg";
+export type ButtonVariant = "primary" | "base";
+export type ButtonSize = "sm" | "md" | "lg";
 
-type ButtonConfig = {
+export type ButtonConfig = {
   x: number;
   y: number;
   variant?: ButtonVariant;

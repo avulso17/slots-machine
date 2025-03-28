@@ -1,13 +1,13 @@
-type AnimationType = "base" | "bounce";
+export type ReelAnimationType = "base" | "bounce";
 
-type ReelConfig = {
+export type ReelConfig = {
   onComplete: () => void;
   turns?: number;
 };
 
-type SpinConfig = {
+export type ReelSpinConfig = {
   symbol: string;
-  animationType?: AnimationType;
+  animationType?: ReelAnimationType;
 };
 
 export class Reel extends Phaser.GameObjects.Container {
@@ -163,7 +163,7 @@ export class Reel extends Phaser.GameObjects.Container {
           repeat: 0,
         },
         {
-          y: "+=52",
+          y: `+=${this.ITEM_SIZE}`,
           duration: 300,
           ease: "Back.out",
           repeat: 0,
@@ -198,7 +198,7 @@ export class Reel extends Phaser.GameObjects.Container {
 
   // Methods
   // funcao para spin symbols
-  public spin(config: SpinConfig) {
+  public spin(config: ReelSpinConfig) {
     if (this.isSpinning) return;
     this.isSpinning = true;
     this.setState("spinning");
