@@ -164,7 +164,7 @@ export class Reel extends Phaser.GameObjects.Container {
         },
         {
           y: "+=52",
-          duration: 400,
+          duration: 300,
           ease: "Back.out",
           repeat: 0,
         },

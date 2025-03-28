@@ -51,11 +51,14 @@ export class SlotsMachine extends Phaser.GameObjects.Container {
 
   private checkReelStopped(reelIndex: number) {
     if (reelIndex === 2) {
+      this.isSpinning = false;
       this.checkWin();
     }
   }
 
   public spinReels() {
+    if (this.isSpinning) return;
+    this.isSpinning = true;
     this.reels.forEach((reel, index) => {
       const symbol = this.result[index] ?? "bell";
       const animationType = index === 2 ? "bounce" : "base";

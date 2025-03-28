@@ -1,11 +1,14 @@
 import { Text } from "./Text";
 
+type ButtonVariant = "primary" | "base";
+type ButtonSize = "sm" | "md" | "lg";
+
 type ButtonConfig = {
   x: number;
   y: number;
-  texture: string;
-  width: number;
-  height: number;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  width?: number;
 };
 
 export class Button extends Phaser.GameObjects.Container {
@@ -13,6 +16,7 @@ export class Button extends Phaser.GameObjects.Container {
   private isDisabled: boolean;
   private button: Phaser.GameObjects.NineSlice;
   private text: Phaser.GameObjects.Text;
+
   constructor(
     scene: Phaser.Scene,
     text: string,
@@ -29,10 +33,10 @@ export class Button extends Phaser.GameObjects.Container {
       .nineslice(
         0,
         0,
-        config.texture,
+        `btn-${config.variant ?? "primary"}-${config.size ?? "md"}`,
         undefined,
         config.width,
-        config.height,
+        undefined,
         28,
         28
       )
@@ -40,8 +44,15 @@ export class Button extends Phaser.GameObjects.Container {
     this.add(this.button);
 
     // Criando o texto do botão
+    const fontSize = {
+      sm: 14,
+      md: 16,
+      lg: 16,
+    };
+
     this.text = new Text(this.scene, 0, 0, text, {
-      fontSize: "32px",
+      fontSize: fontSize[config.size ?? "md"] * 1.5,
+      resolution: 2,
     });
     this.text.setOrigin(0.5, 0.5);
     this.text.setDepth(1);

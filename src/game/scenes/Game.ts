@@ -34,9 +34,9 @@ export class Game extends Scene {
       {
         x: centerX,
         y: centerY + 150,
-        texture: "button-primary",
-        height: 56,
-        width: 200,
+        variant: "primary",
+        size: "md",
+        width: 150,
       },
       () => {
         this.slotsMachine.spinReels();
