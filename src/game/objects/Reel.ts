@@ -155,21 +155,18 @@ export class Reel extends Phaser.GameObjects.Container {
           duration,
           ease: "Linear",
           repeat: 0,
-          setRoundPixels: true,
         },
         {
           y: `+=${this.TOTAL_HEIGHT - this.ITEM_SIZE}`,
           duration: 1100,
           ease: "Quad.out",
           repeat: 0,
-          setRoundPixels: true,
         },
         {
           y: "+=52",
           duration: 400,
           ease: "Back.out",
           repeat: 0,
-          setRoundPixels: true,
         },
       ];
     } else {
@@ -179,7 +176,6 @@ export class Reel extends Phaser.GameObjects.Container {
           duration,
           ease: "Linear",
           repeat: 0,
-          setRoundPixels: true,
         },
         {
           y: "+=10",
@@ -187,7 +183,6 @@ export class Reel extends Phaser.GameObjects.Container {
           ease: "Power1",
           repeat: 0,
           yoyo: true,
-          setRoundPixels: true,
         },
       ];
     }

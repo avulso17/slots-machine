@@ -23,34 +23,25 @@ export class Game extends Scene {
   }
 
   create() {
-    const reelWidth = 96;
-    const centerX = 185;
-    const centerY = 362;
+    const centerX = this.game.canvas.width / 2;
+    const centerY = this.game.canvas.height / 2;
 
     this.slotsMachine = new SlotsMachine(this, centerX - 90, centerY - 100);
 
-    const button = new Button(this, {
-      x: centerX,
-      y: centerY + 250,
-      texture: "button-primary",
-      height: 56,
-      width: 200,
-    })
-      .setOrigin(0.5)
-      .setInteractive()
-      .on("pointerdown", () => {
+    new Button(
+      this,
+      "Girar",
+      {
+        x: centerX,
+        y: centerY + 150,
+        texture: "button-primary",
+        height: 56,
+        width: 200,
+      },
+      () => {
         this.slotsMachine.spinReels();
-        // this.slotsMachine.console();
-      });
-
-    this.tweens.add({
-      targets: button,
-      scale: 1.1,
-      duration: 1000,
-      ease: "sine.inout",
-      yoyo: true,
-      repeat: -1,
-    });
+      }
+    );
   }
 
   update() {

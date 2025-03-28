@@ -1,69 +1,98 @@
-export type ButtonProps = {
+import { Text } from "./Text";
+
+type ButtonConfig = {
   x: number;
   y: number;
   texture: string;
-  height?: number;
-  width?: number;
+  width: number;
+  height: number;
 };
 
-export class Button extends Phaser.GameObjects.NineSlice {
-  text: Phaser.GameObjects.Text;
-
-  constructor(scene: Phaser.Scene, props: ButtonProps) {
-    super(
-      scene,
-      props.x,
-      props.y,
-      props.texture,
-      undefined,
-      props.width ?? 102,
-      props.height ?? 56,
-      28,
-      28
-    );
+export class Button extends Phaser.GameObjects.Container {
+  private callback: () => void;
+  private isDisabled: boolean;
+  private button: Phaser.GameObjects.NineSlice;
+  private text: Phaser.GameObjects.Text;
+  constructor(
+    scene: Phaser.Scene,
+    text: string,
+    config: ButtonConfig,
+    callback: () => void
+  ) {
+    super(scene, config.x, config.y);
     this.scene = scene;
-    this.setName("button-primary");
+    this.callback = callback;
+    this.isDisabled = false; // Estado inicial habilitado
 
-    this.setText("Girar");
+    // Criando a imagem do botão
+    this.button = this.scene.add
+      .nineslice(
+        0,
+        0,
+        config.texture,
+        undefined,
+        config.width,
+        config.height,
+        28,
+        28
+      )
+      .setInteractive();
+    this.add(this.button);
 
-    this.preFX?.addShine(1, 0.2, 5);
+    // Criando o texto do botão
+    this.text = new Text(this.scene, 0, 0, text, {
+      fontSize: "32px",
+    });
+    this.text.setOrigin(0.5, 0.5);
+    this.text.setDepth(1);
+    this.add(this.text);
 
+    // Adiciona interatividade
+    this.button.on("pointerdown", this.onPress, this);
+    this.button.on("pointerup", this.onRelease, this);
+    this.button.on("pointerout", this.onCancel, this);
+
+    // Adiciona à cena
     this.scene.add.existing(this);
   }
 
-  public setText(text: string) {
-    const centerX = this.x;
-    const centerY = this.y;
-
-    this.text = this.scene.add
-      .text(centerX, centerY, text, {
-        fontSize: "32px",
-        fontFamily: "aglet-ultra",
-        color: "#EAEAEA",
-        stroke: "#41001F",
-        strokeThickness: 4,
-        shadow: {
-          color: "#41001F",
-          offsetX: 0,
-          offsetY: 2,
-          blur: 0,
-          stroke: true,
-        },
-        padding: { x: 10, y: 5 },
-      })
-      .setDepth(1)
-      .setOrigin(0.5, 0.5);
-  }
-
-  public onPointerDown() {
-    this.text.setStyle({
-      color: "#41001F",
+  onPress() {
+    if (this.isDisabled) return;
+    if (this.callback) this.callback();
+    this.scene.tweens.add({
+      targets: [this.button, this.text],
+      scaleX: 0.9,
+      scaleY: 0.9,
+      duration: 100,
+      ease: "Quad.easeOut",
     });
   }
 
-  public onPointerUp() {
-    this.text.setStyle({
-      color: "#EAEAEA",
+  onRelease() {
+    if (this.isDisabled) return;
+    this.scene.tweens.add({
+      targets: [this.button, this.text],
+      scaleX: 1,
+      scaleY: 1,
+      duration: 100,
+      ease: "Quad.easeOut",
     });
+  }
+
+  onCancel() {
+    if (this.isDisabled) return;
+    this.scene.tweens.add({
+      targets: [this.button, this.text],
+      scaleX: 1,
+      scaleY: 1,
+      duration: 100,
+      ease: "Quad.easeOut",
+    });
+  }
+
+  setDisabled(disabled: boolean) {
+    this.isDisabled = disabled;
+    this.button.setTint(disabled ? 0x666666 : 0xffffff);
+    this.button.disableInteractive(disabled);
   }
 }
